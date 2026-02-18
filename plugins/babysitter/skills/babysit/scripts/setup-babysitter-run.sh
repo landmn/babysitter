@@ -140,7 +140,7 @@ fi
 
 # Determine state directory (plugin-relative for session isolation)
 if [[ -n "${CLAUDE_PLUGIN_ROOT:-}" ]]; then
-  STATE_DIR="$CLAUDE_PLUGIN_ROOT/state"
+  STATE_DIR="$CLAUDE_PLUGIN_ROOT/skills/babysit/state"
 else
   # Fallback: derive from script location
   STATE_DIR="$(dirname "$(dirname "$0")")/state"
