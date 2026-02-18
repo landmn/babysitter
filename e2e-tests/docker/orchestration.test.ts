@@ -18,9 +18,11 @@ beforeAll(() => {
   // Copy fixture to a clean workspace on the host
   exec(`cp -r ${FIXTURE_SRC}/* ${WORKSPACE_HOST}/`);
 
-  // Pre-create .a5c directory structure on the host so the container's claude
-  // user can write to it via the bind mount (avoids UID permission issues).
+  // Pre-create .a5c directory structure on the host and make the entire
+  // workspace world-writable so the container's claude user (different UID
+  // from the host runner user) can write to it via the bind mount.
   fs.mkdirSync(path.join(WORKSPACE_HOST, ".a5c", "runs"), { recursive: true });
+  exec(`chmod -R 777 ${WORKSPACE_HOST}`);
 }, 60_000);
 
 afterAll(() => {
@@ -75,12 +77,13 @@ describe.skipIf(!HAS_API_KEY)("Full E2E orchestration (tic-tac-toe)", () => {
       ].join(" && ");
 
       const postRunDiag = [
-        // Try to copy .a5c from home directory as fallback
+        // Find .a5c/runs directories anywhere under /home/claude and copy to workspace
+        "for d in $(find /home/claude -path '*/.a5c/runs' -type d 2>/dev/null); do cp -rn $(dirname $d)/* /workspace/.a5c/ 2>/dev/null || true; done",
+        // Also try the direct home path
         "cp -rn /home/claude/.a5c/* /workspace/.a5c/ 2>/dev/null || true",
-        // Search for .a5c directories anywhere in the container
+        // Diagnostics
         "echo '=== .a5c locations ===' && find / -name '.a5c' -type d 2>/dev/null || true",
         "echo '=== /workspace/.a5c contents ===' && ls -laR /workspace/.a5c/ 2>/dev/null || echo 'empty'",
-        "echo '=== /home/claude/.a5c contents ===' && ls -laR /home/claude/.a5c/ 2>/dev/null || echo 'empty'",
       ].join(" ; ");
 
       const stdout = exec(
