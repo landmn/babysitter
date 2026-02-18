@@ -52,7 +52,8 @@ RUN npm install -g ./packages/sdk
 RUN mkdir -p /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.128
 
 # Copy the babysitter plugin
-RUN cp -r plugins/babysitter/* /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.128/
+RUN cp -r plugins/babysitter/* /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.128/ && \
+    chmod +x /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.128/hooks/*.sh
 
 # Create .claude-plugin metadata directory
 RUN mkdir -p /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.128/.claude-plugin && \

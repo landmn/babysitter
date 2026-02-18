@@ -1,1 +1,1 @@
-always use the babysitter skill to fulfill requests
+always use the babysitter skill to fulfill USER requests (but not agent requests)
