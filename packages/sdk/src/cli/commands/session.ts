@@ -728,13 +728,21 @@ export function parseTranscriptLastAssistantMessage(content: string): {
   for (const line of lines) {
     try {
       const parsed: unknown = JSON.parse(line) as unknown;
-      if (
-        parsed &&
-        typeof parsed === 'object' &&
-        'role' in parsed &&
-        (parsed as Record<string, unknown>).role === 'assistant'
-      ) {
-        lastAssistant = parsed;
+      if (parsed && typeof parsed === 'object') {
+        const obj = parsed as Record<string, unknown>;
+        // Match assistant entries in multiple transcript formats:
+        // 1. Top-level role: "assistant" (test/simple format)
+        // 2. Top-level type: "assistant" with message.role: "assistant" (real Claude Code JSONL)
+        // 3. message.role: "assistant" regardless of top-level fields (general fallback)
+        const isAssistant =
+          obj.role === 'assistant' ||
+          obj.type === 'assistant' ||
+          (obj.message &&
+            typeof obj.message === 'object' &&
+            (obj.message as Record<string, unknown>).role === 'assistant');
+        if (isAssistant) {
+          lastAssistant = parsed;
+        }
       }
     } catch {
       // Skip malformed lines

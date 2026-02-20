@@ -184,6 +184,115 @@ describe('parseTranscriptLastAssistantMessage', () => {
     expect(result.found).toBe(false);
     expect(result.text).toBeNull();
   });
+
+  // ── Real Claude Code transcript format tests ─────────────────────
+
+  it('matches entries with top-level type: "assistant" and message.role: "assistant" (real Claude Code format)', () => {
+    const line = JSON.stringify({
+      type: 'assistant',
+      message: {
+        id: 'msg_01ABC123',
+        type: 'message',
+        role: 'assistant',
+        content: [
+          { type: 'text', text: 'Real Claude Code response.' },
+        ],
+      },
+    });
+
+    const result = parseTranscriptLastAssistantMessage(line);
+
+    expect(result.found).toBe(true);
+    expect(result.text).toBe('Real Claude Code response.');
+  });
+
+  it('matches entries with only message.role: "assistant" (no top-level role or type)', () => {
+    const line = JSON.stringify({
+      message: {
+        id: 'msg_01DEF456',
+        type: 'message',
+        role: 'assistant',
+        content: [
+          { type: 'text', text: 'Fallback assistant detection.' },
+        ],
+      },
+    });
+
+    const result = parseTranscriptLastAssistantMessage(line);
+
+    expect(result.found).toBe(true);
+    expect(result.text).toBe('Fallback assistant detection.');
+  });
+
+  it('picks the last assistant from a mixed real Claude Code transcript', () => {
+    const lines = [
+      JSON.stringify({
+        type: 'human',
+        message: {
+          id: 'msg_user1',
+          type: 'message',
+          role: 'user',
+          content: [{ type: 'text', text: 'User prompt' }],
+        },
+      }),
+      JSON.stringify({
+        type: 'assistant',
+        message: {
+          id: 'msg_asst1',
+          type: 'message',
+          role: 'assistant',
+          content: [{ type: 'text', text: 'First real assistant reply' }],
+        },
+      }),
+      JSON.stringify({
+        type: 'human',
+        message: {
+          id: 'msg_user2',
+          type: 'message',
+          role: 'user',
+          content: [{ type: 'text', text: 'Follow-up' }],
+        },
+      }),
+      JSON.stringify({
+        type: 'assistant',
+        message: {
+          id: 'msg_asst2',
+          type: 'message',
+          role: 'assistant',
+          content: [
+            { type: 'text', text: 'Second real assistant reply with <promise>PROOF123</promise>' },
+          ],
+        },
+      }),
+    ].join('\n');
+
+    const result = parseTranscriptLastAssistantMessage(lines);
+
+    expect(result.found).toBe(true);
+    expect(result.text).toContain('Second real assistant reply');
+    expect(result.text).toContain('<promise>PROOF123</promise>');
+  });
+
+  it('handles real Claude Code format with tool_use and text blocks', () => {
+    const line = JSON.stringify({
+      type: 'assistant',
+      message: {
+        id: 'msg_01GHI789',
+        type: 'message',
+        role: 'assistant',
+        content: [
+          { type: 'text', text: 'Let me run a command.' },
+          { type: 'tool_use', id: 'tool-1', name: 'Bash', input: { command: 'ls' } },
+          { type: 'text', text: 'Done running the command.' },
+        ],
+      },
+    });
+
+    const result = parseTranscriptLastAssistantMessage(line);
+
+    expect(result.found).toBe(true);
+    expect(result.text).toBe('Let me run a command.\nDone running the command.');
+  });
 });
 
 // ── extractPromiseTag ────────────────────────────────────────────────
