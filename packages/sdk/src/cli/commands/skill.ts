@@ -166,7 +166,7 @@ async function readCache(runId: string, ttl: number): Promise<SkillCacheEntry | 
   const cachePath = getCachePath(runId, 'json');
   try {
     const content = await fs.readFile(cachePath, 'utf8');
-    const entry: SkillCacheEntry = JSON.parse(content);
+    const entry = JSON.parse(content) as SkillCacheEntry;
     const age = (Date.now() - entry.timestamp) / 1000;
     if (age < ttl) {
       return entry;
@@ -632,11 +632,13 @@ export async function handleSkillFetchRemote(args: SkillCommandArgs): Promise<nu
       skills = await discoverWellKnown(url);
       break;
     default: {
-      const error = { error: 'INVALID_SOURCE_TYPE', message: `Unknown source type: ${sourceType}` };
+      const _exhaustive: never = sourceType;
+      const unknownType = _exhaustive as string;
+      const error = { error: 'INVALID_SOURCE_TYPE', message: `Unknown source type: ${unknownType}` };
       if (json) {
         console.error(JSON.stringify(error));
       } else {
-        console.error(`❌ Error: Unknown source type: ${sourceType}`);
+        console.error(`❌ Error: Unknown source type: ${unknownType}`);
       }
       return 1;
     }

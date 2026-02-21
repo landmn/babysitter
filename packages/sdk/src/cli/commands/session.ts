@@ -14,7 +14,6 @@ import { discoverSkillsInternal } from './skill';
 import {
   SessionState,
   SessionError,
-  SessionErrorCode,
   readSessionFile,
   sessionFileExists,
   getSessionFilePath,
@@ -23,7 +22,6 @@ import {
   getCurrentTimestamp,
   updateIterationTimes,
   isIterationTooFast,
-  DEFAULT_SESSION_STATE,
 } from '../../session';
 
 /**
@@ -318,15 +316,15 @@ export async function handleSessionResume(args: SessionCommandArgs): Promise<num
   let processId = 'unknown';
   try {
     const runJsonPath = path.join(runDir, 'run.json');
-    const runJson = JSON.parse(await fs.readFile(runJsonPath, 'utf8'));
-    processId = runJson.processId ?? 'unknown';
+    const runJson = JSON.parse(await fs.readFile(runJsonPath, 'utf8')) as Record<string, unknown>;
+    processId = (typeof runJson.processId === 'string' ? runJson.processId : undefined) ?? 'unknown';
 
     // Check journal for completion
     const journalDir = path.join(runDir, 'journal');
     const journalFiles = await fs.readdir(journalDir);
     const lastFile = journalFiles.filter(f => f.endsWith('.json')).sort().pop();
     if (lastFile) {
-      const lastEvent = JSON.parse(await fs.readFile(path.join(journalDir, lastFile), 'utf8'));
+      const lastEvent = JSON.parse(await fs.readFile(path.join(journalDir, lastFile), 'utf8')) as Record<string, unknown>;
       if (lastEvent.type === 'RUN_COMPLETED') {
         runState = 'completed';
       } else if (lastEvent.type === 'RUN_FAILED') {

@@ -54,7 +54,7 @@ then this phase can have: research online, research the repo, user questions, an
 after the interview phase, create the complete custom process files (js and jsons) for the run according to the Process Creation Guidelines and methodologies section. also install the babysitter-sdk inside .a5c if it is not already installed. (install it in .a5c/package.json if it is not already installed, make sure to use the latest version)
 you must abide the syntax and structure of the process files from the process library.
 
-After the process is created and before setting up the session, describe the process in high level (not the code or implementation details) to the user and ask for confirmation to use it. if the user is not satisfied with the process, go back to the process creation phase and modify the process according to the feedback of the user until the user is satisfied with the process.
+After the process is created and before setting up the session, describe the process in high level (not the code or implementation details) to the user and ask for confirmation to use it, also generate it as a [process-name].diagram.md and [process-name].process.md file. if the user is not satisfied with the process, go back to the process creation phase and modify the process according to the feedback of the user until the user is satisfied with the process.
 
 ### 2. Setup session:
 
