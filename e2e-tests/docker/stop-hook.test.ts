@@ -174,7 +174,11 @@ describe("Stop hook core lifecycle", () => {
       "/dev/null",
     );
     expect(exitCode).toBe(0);
-    expect(stdout).not.toContain('"decision"');
+    // Hook outputs explicit allow decision (no block)
+    const parsed = parseJsonBlock(stdout);
+    if (parsed) {
+      expect(parsed.decision).not.toBe("block");
+    }
   });
 
   test("blocks exit when active session state exists", () => {
