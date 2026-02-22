@@ -20,4 +20,14 @@ if ! command -v babysitter &>/dev/null; then
   fi
 fi
 
-exec babysitter hook:run --hook-type session-start --harness claude-code --json < /dev/stdin
+# Capture stdin to a temp file so the CLI receives a clean EOF
+# (piping /dev/stdin directly can keep the Node.js event loop alive)
+INPUT_FILE=$(mktemp 2>/dev/null || echo "/tmp/hook-session-start-$$.json")
+cat > "$INPUT_FILE"
+
+RESULT=$(babysitter hook:run --hook-type session-start --harness claude-code --plugin-root "$PLUGIN_ROOT" --json < "$INPUT_FILE" 2>/dev/null)
+EXIT_CODE=$?
+
+rm -f "$INPUT_FILE" 2>/dev/null
+printf '%s\n' "$RESULT"
+exit $EXIT_CODE

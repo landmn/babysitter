@@ -542,6 +542,12 @@ async function handleHookRunSessionStart(
   } catch {
     process.stdout.write("{}\n");
     return 0;
+  } finally {
+    // Unref stdin so it doesn't keep the event loop alive.
+    // The session-start handler is short-lived and doesn't need stdin after this.
+    // (The stop handler is unaffected — its shell script pipes from a temp file
+    // which reaches EOF naturally, so the event loop drains without unref.)
+    process.stdin.unref();
   }
 
   const hookInput = parseHookInput(rawInput) as ClaudeCodeSessionStartHookInput;
