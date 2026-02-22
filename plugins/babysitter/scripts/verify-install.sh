@@ -238,14 +238,19 @@ check_plugin_structure() {
 check_sdk_cli() {
     local sdk_version
 
-    # Try to get version from SDK CLI
-    if sdk_version=$(npx -y @a5c-ai/babysitter-sdk@latest --version 2>/dev/null); then
+    # Try to get version from SDK CLI (prefer globally-installed babysitter)
+    if command -v babysitter &>/dev/null; then
+        sdk_version=$(babysitter --version 2>/dev/null || echo "")
+    else
+        sdk_version=$(npx -y @a5c-ai/babysitter-sdk --version 2>/dev/null || echo "")
+    fi
+    if [[ -n "$sdk_version" ]]; then
         log_check "pass" "SDK CLI" "Version ${sdk_version}"
         return 0
     else
         log_check "fail" "SDK CLI" "Unable to run SDK CLI. Check npm/network connectivity."
         if [[ "$JSON_OUTPUT" != "true" ]]; then
-            echo "      Try: npx -y @a5c-ai/babysitter-sdk@latest --version"
+            echo "      Try: npm i -g @a5c-ai/babysitter @a5c-ai/babysitter-sdk"
         fi
         return 1
     fi

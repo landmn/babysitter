@@ -31,6 +31,7 @@ import {
 } from "./commands/session";
 import { handleSkillDiscover, handleSkillFetchRemote } from "./commands/skill";
 import { handleHookLog } from "./commands/hookLog";
+import { handleHookRun } from "./commands/hookRun";
 import { resolveCompletionProof } from "./completionProof";
 import {
   BabysitterRuntimeError,
@@ -63,6 +64,7 @@ const USAGE = `Usage:
   babysitter session:iteration-message --iteration <n> [--run-id <id>] [--runs-dir <dir>] [--plugin-root <dir>] [--json]
   babysitter skill:discover --plugin-root <dir> [--run-id <id>] [--cache-ttl <seconds>] [--runs-dir <dir>] [--include-remote] [--summary-only] [--json]
   babysitter hook:log --hook-type <type> --log-file <path> [--json]
+  babysitter hook:run --hook-type <stop|session-start> [--plugin-root <dir>] [--state-dir <dir>] [--runs-dir <dir>] [--json] [--verbose]
   babysitter skill:fetch-remote --source-type <github|well-known> --url <url> [--json]
   babysitter health [--json] [--verbose]
   babysitter configure [show|validate|paths] [--json] [--defaults-only]
@@ -1817,6 +1819,7 @@ const VALID_COMMANDS = [
   "session:last-message",
   "session:iteration-message",
   "hook:log",
+  "hook:run",
   "skill:discover",
   "skill:fetch-remote",
   "health",
@@ -2035,6 +2038,16 @@ export function createBabysitterCli() {
             hookType: parsed.hookType ?? "",
             logFile: parsed.logFile ?? "",
             json: parsed.json,
+          });
+        }
+        if (parsed.command === "hook:run") {
+          return await handleHookRun({
+            hookType: parsed.hookType ?? "",
+            pluginRoot: parsed.pluginRoot,
+            stateDir: parsed.stateDir,
+            runsDir: parsed.runsDir,
+            json: parsed.json,
+            verbose: parsed.verbose,
           });
         }
         // Skill commands
