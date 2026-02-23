@@ -7,7 +7,7 @@
   "license": "MIT",
   "hooks": {
     "SessionStart": "hooks/babysitter-session-start-hook.sh",
-    "SessionEnd": "hooks/babysitter-stop-hook.sh"
+    "Stop": "hooks/babysitter-stop-hook.sh"
   },
   "commands": [],
   "skills": [

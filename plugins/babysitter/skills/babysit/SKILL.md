@@ -112,7 +112,7 @@ $CLI session:resume --session-id "${CLAUDE_SESSION_ID}" \
 ### 3. Run Iteration
 
 ```bash
-$CLI run:iterate .a5c/runs/<runId> --json --iteration <n>
+$CLI run:iterate .a5c/runs/<runId> --json --iteration <n> --plugin-root "${CLAUDE_PLUGIN_ROOT}"
 ```
 
 **Output:**
@@ -359,7 +359,7 @@ $CLI task:post <runId> <effectId> --status <ok|error> --json
 
 **Iterate:**
 ```bash
-$CLI run:iterate <runId> --json --iteration <n>
+$CLI run:iterate <runId> --json --iteration <n> --plugin-root "${CLAUDE_PLUGIN_ROOT}"
 ```
 ---
 
