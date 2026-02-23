@@ -4,40 +4,43 @@
 
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 
-# If babysitter CLI is not installed, allow exit silently.
-# (Session-start hook handles installation; if it failed, don't block exit.)
-command -v babysitter &>/dev/null || { echo '{"decision":"approve"}'; exit 0; }
-LOG_DIR="${BABYSITTER_LOG_DIR:-}"
-LOG_FILE="${LOG_DIR:+$LOG_DIR/babysitter-stop-hook.log}"
-
-# Diagnostic logging (when BABYSITTER_LOG_DIR is set)
-if [ -n "$LOG_FILE" ]; then
-  mkdir -p "$LOG_DIR" 2>/dev/null
-  {
-    echo "[INFO] $(date -u +%Y-%m-%dT%H:%M:%SZ) Hook script invoked"
-    echo "[INFO] $(date -u +%Y-%m-%dT%H:%M:%SZ) PLUGIN_ROOT=$PLUGIN_ROOT"
-  } >> "$LOG_FILE" 2>/dev/null
+# Resolve babysitter CLI: installed binary, user-local prefix, or npx fallback
+if ! command -v babysitter &>/dev/null; then
+  # Try user-local prefix (set by session-start hook)
+  if [ -x "$HOME/.local/bin/babysitter" ]; then
+    export PATH="$HOME/.local/bin:$PATH"
+  else
+    # Last resort: npx fallback
+    SDK_VERSION=$(node -e "try{console.log(JSON.parse(require('fs').readFileSync('${PLUGIN_ROOT}/plugin.json','utf8')).sdkVersion||'latest')}catch{console.log('latest')}" 2>/dev/null || echo "latest")
+    if [ -n "$SDK_VERSION" ]; then
+      babysitter() { npx -y "@a5c-ai/babysitter-sdk@${SDK_VERSION}" "$@"; }
+    else
+      # No CLI available at all — allow exit silently
+      echo '{"decision":"approve"}'
+      exit 0
+    fi
+  fi
 fi
+LOG_DIR="${BABYSITTER_LOG_DIR:-.a5c/logs}"
+LOG_FILE="$LOG_DIR/babysitter-stop-hook.log"
+
+mkdir -p "$LOG_DIR" 2>/dev/null
+{
+  echo "[INFO] $(date -u +%Y-%m-%dT%H:%M:%SZ) Hook script invoked"
+  echo "[INFO] $(date -u +%Y-%m-%dT%H:%M:%SZ) PLUGIN_ROOT=$PLUGIN_ROOT"
+} >> "$LOG_FILE" 2>/dev/null
 
 # Capture stdin so we can log size and pass to CLI
 INPUT_FILE=$(mktemp 2>/dev/null || echo "/tmp/hook-input-$$.json")
 cat > "$INPUT_FILE"
 
-if [ -n "$LOG_FILE" ]; then
-  echo "[INFO] $(date -u +%Y-%m-%dT%H:%M:%SZ) Hook input received ($(wc -c < "$INPUT_FILE") bytes)" >> "$LOG_FILE" 2>/dev/null
-fi
+echo "[INFO] $(date -u +%Y-%m-%dT%H:%M:%SZ) Hook input received ($(wc -c < "$INPUT_FILE") bytes)" >> "$LOG_FILE" 2>/dev/null
 
-# Run the CLI, capturing stdout; redirect stderr to log if available
-if [ -n "$LOG_DIR" ]; then
-  RESULT=$(babysitter hook:run --hook-type stop --harness claude-code --plugin-root "$PLUGIN_ROOT" --json < "$INPUT_FILE" 2>"$LOG_DIR/babysitter-stop-hook-stderr.log")
-else
-  RESULT=$(babysitter hook:run --hook-type stop --harness claude-code --plugin-root "$PLUGIN_ROOT" --json < "$INPUT_FILE" 2>/dev/null)
-fi
+# Run the CLI, capturing stdout; redirect stderr to log
+RESULT=$(babysitter hook:run --hook-type stop --harness claude-code --plugin-root "$PLUGIN_ROOT" --json < "$INPUT_FILE" 2>"$LOG_DIR/babysitter-stop-hook-stderr.log")
 EXIT_CODE=$?
 
-if [ -n "$LOG_FILE" ]; then
-  echo "[INFO] $(date -u +%Y-%m-%dT%H:%M:%SZ) CLI exit code=$EXIT_CODE" >> "$LOG_FILE" 2>/dev/null
-fi
+echo "[INFO] $(date -u +%Y-%m-%dT%H:%M:%SZ) CLI exit code=$EXIT_CODE" >> "$LOG_FILE" 2>/dev/null
 
 rm -f "$INPUT_FILE" 2>/dev/null
 printf '%s\n' "$RESULT"

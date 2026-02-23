@@ -23,6 +23,10 @@ RUN groupadd -r claude && useradd -r -g claude -m -d /home/claude claude
 # Set environment variables
 ENV HOME=/home/claude
 
+# Configure npm global prefix for non-root user so hooks can install packages
+RUN mkdir -p /home/claude/.local && \
+    echo "prefix=/home/claude/.local" > /home/claude/.npmrc
+
 # Install Claude Code globally
 RUN npm install -g @anthropic-ai/claude-code
 
@@ -49,20 +53,20 @@ ENV NODE_ENV=production
 RUN npm install -g ./packages/sdk
 
 # Set up Claude plugin directory structure (matching host cache structure)
-RUN mkdir -p /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.128
+RUN mkdir -p /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.139
 
 # Copy the babysitter plugin
-RUN cp -r plugins/babysitter/* /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.128/ && \
-    chmod +x /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.128/hooks/*.sh && \
-    find /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.128/skills -name "*.sh" -exec chmod +x {} + 2>/dev/null || true
+RUN cp -r plugins/babysitter/* /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.139/ && \
+    chmod +x /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.139/hooks/*.sh && \
+    find /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.139/skills -name "*.sh" -exec chmod +x {} + 2>/dev/null || true
 
 # Create .claude-plugin metadata directory
-RUN mkdir -p /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.128/.claude-plugin && \
-    echo '{"name": "babysitter", "version": "4.0.128", "description": "Orchestrate complex workflows with babysitter", "author": {"name": "a5c.ai", "email": "info@a5c.ai"}}' > /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.128/.claude-plugin/plugin.json
+RUN mkdir -p /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.139/.claude-plugin && \
+    echo '{"name": "babysitter", "version": "4.0.139", "description": "Orchestrate complex workflows with babysitter", "author": {"name": "a5c.ai", "email": "info@a5c.ai"}}' > /home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.139/.claude-plugin/plugin.json
 
 # Create Claude settings with the plugin registered (version 2 format)
 RUN mkdir -p /home/claude/.claude/plugins && \
-    echo '{"version": 2, "plugins": {"babysitter@a5c.ai": [{"scope": "user", "installPath": "/home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.128", "version": "4.0.128", "installedAt": "2026-02-05T00:00:00.000Z", "lastUpdated": "2026-02-05T00:00:00.000Z"}]}}' > /home/claude/.claude/plugins/installed_plugins.json && \
+    echo '{"version": 2, "plugins": {"babysitter@a5c.ai": [{"scope": "user", "installPath": "/home/claude/.claude/plugins/cache/a5c-ai/babysitter/4.0.139", "version": "4.0.139", "installedAt": "2026-02-05T00:00:00.000Z", "lastUpdated": "2026-02-05T00:00:00.000Z"}]}}' > /home/claude/.claude/plugins/installed_plugins.json && \
     echo '{"enabledPlugins": {"babysitter@a5c.ai": true}}' > /home/claude/.claude/settings.json
 
 # Set ownership of claude home directory
@@ -75,6 +79,9 @@ RUN chmod +x /entrypoint.sh
 # Create workspace directory for mounting projects
 RUN mkdir -p /workspace && chown claude:claude /workspace
 WORKDIR /workspace
+
+# Ensure user-local npm bin is on PATH (for hooks installing packages at runtime)
+ENV PATH="/home/claude/.local/bin:${PATH}"
 
 # Switch to non-root user
 USER claude
