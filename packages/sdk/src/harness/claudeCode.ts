@@ -545,7 +545,7 @@ async function handleStopHookImpl(args: HookHandlerArgs): Promise<number> {
     iterationContext = `Babysitter iteration ${nextIteration} | Continue orchestration (run:iterate).`;
   }
 
-  // 9. Try to resolve skill context
+  // 9. Try to resolve skill/agent context relevant to the process
   if (resolvedPluginRoot) {
     try {
       const discoverResult = await discoverSkillsInternal({
@@ -554,13 +554,28 @@ async function handleStopHookImpl(args: HookHandlerArgs): Promise<number> {
         runsDir,
         processPath: entrypointImportPath,
       });
-      if (discoverResult.summary) {
-        // Cap skill summary to avoid bloating the reason field
-        const maxSummaryLen = 300;
-        const summary = discoverResult.summary.length > maxSummaryLen
-          ? discoverResult.summary.slice(0, maxSummaryLen) + "..."
-          : discoverResult.summary;
-        iterationContext = `${iterationContext} | Available skills: ${summary}`;
+
+      // Exclude the babysit skill itself (it's the orchestrator, not a worker)
+      const EXCLUDED_SKILLS = new Set(["babysit", "babysitter"]);
+      const relevantSkills = (discoverResult.skills || []).filter(
+        (s) => !EXCLUDED_SKILLS.has(s.name.toLowerCase()),
+      );
+      const relevantAgents = discoverResult.agents || [];
+
+      // Build a compact list with full paths, capped at 10 total
+      const MAX_ITEMS = 10;
+      const items: string[] = [];
+      for (const s of relevantSkills) {
+        if (items.length >= MAX_ITEMS) break;
+        items.push(`skill:${s.name}${s.file ? ` [${s.file}]` : ""}`);
+      }
+      for (const a of relevantAgents) {
+        if (items.length >= MAX_ITEMS) break;
+        items.push(`agent:${a.name}${a.file ? ` [${a.file}]` : ""}`);
+      }
+
+      if (items.length > 0) {
+        iterationContext = `${iterationContext} | Discovered: ${items.join(", ")}`;
       }
     } catch {
       // Skill discovery failure is non-fatal
