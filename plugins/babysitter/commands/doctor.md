@@ -50,11 +50,20 @@ For each journal file (named `<seq>.<ulid>.json`):
 - If gaps found, mark as WARN and list the missing sequence numbers.
 
 **Checksum verification:**
+
+The SDK computes checksums as follows: it first builds the event payload **without** the `checksum` field (`{ type, recordedAt, data }`), serializes it with `JSON.stringify(payload, null, 2) + "\n"` (pretty-printed with a trailing newline), then computes SHA256 of that string. To verify:
+
 - Read each journal file as JSON.
 - Extract and remove the `checksum` field from the parsed object.
-- Recompute SHA256 of the remaining JSON (use `JSON.stringify` of the object without the checksum field, or use a bash one-liner: parse the file, remove the checksum key, stringify, pipe to `sha256sum`).
+- Re-serialize the remaining object with `JSON.stringify(remaining, null, 2) + "\n"` — **must** use 2-space indentation and a trailing newline to match the SDK.
+- Compute SHA256 (hex) of that exact string.
 - Compare computed checksum with the stored checksum.
 - If any mismatch, mark as FAIL and list the corrupt files.
+
+Example bash one-liner for a single file:
+```bash
+node -e "const fs=require('fs'); const f=process.argv[1]; const obj=JSON.parse(fs.readFileSync(f,'utf8')); const stored=obj.checksum; delete obj.checksum; const expected=require('crypto').createHash('sha256').update(JSON.stringify(obj,null,2)+'\n').digest('hex'); console.log(stored===expected?'OK':'MISMATCH',f)" <file>
+```
 
 **Timestamp monotonicity check:**
 - Extract `recordedAt` from each event.
