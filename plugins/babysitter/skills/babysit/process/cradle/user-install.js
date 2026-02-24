@@ -191,37 +191,6 @@ export async function process(inputs, ctx) {
     profileDir: existingProfileDir
   });
 
-  // ============================================================================
-  // PHASE 10: COMMUNITY (optional, non-blocking)
-  // ============================================================================
-
-  await ctx.breakpoint({
-    question: [
-      '🎉 Your babysitter profile is all set up and ready to go!',
-      '',
-      'One small thing before we wrap up...',
-      '',
-      'If babysitter has been helpful (or at least entertainingly chaotic),',
-      'would you consider giving the repo a ⭐ on GitHub?',
-      '',
-      '  👉  https://github.com/a5c-ai/babysitter',
-      '',
-      'Stars help other developers discover the project, and honestly,',
-      'it makes the maintainers mass-produce dopamine every time the counter goes up.',
-      'We are simple creatures.',
-      '',
-      'No pressure though — your profile is saved either way. 😄',
-      '',
-      '(Just hit approve to continue)'
-    ].join('\n'),
-    title: 'One Last Thing... ⭐',
-    context: {
-      runId: ctx.runId,
-      repoUrl: 'https://github.com/a5c-ai/babysitter',
-      note: 'This is purely optional and does not affect the setup.'
-    }
-  });
-
   return {
     success: true,
     profile: saveResult.savedProfile,
