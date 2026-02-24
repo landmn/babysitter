@@ -256,14 +256,17 @@ describe("Babysitter Profile CLI", () => {
   });
 
   test("profile:merge without existing profile returns error", () => {
-    const { exitCode } = dockerExecSafe(
+    // Write the temp file, then run merge (which should fail), capture its exit code
+    const { stdout, exitCode } = dockerExecSafe(
       [
         `echo '{"name":"x"}' > /tmp/merge-fail.json`,
-        `babysitter profile:merge --user --input /tmp/merge-fail.json --dir /tmp/nonexistent-profile --json`,
+        `babysitter profile:merge --user --input /tmp/merge-fail.json --dir /tmp/nonexistent-profile --json; MERGE_EXIT=$?`,
         `rm -f /tmp/merge-fail.json`,
-      ].join(" ; "),
+        `exit $MERGE_EXIT`,
+      ].join(" && "),
     );
     expect(exitCode).toBe(1);
+    expect(stdout).toContain("No existing user profile");
   });
 
   // ---- profile:render ----
