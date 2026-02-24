@@ -20,6 +20,102 @@ Historical release entries below are preserved for reference but the extension w
 - No unreleased changes.
 
 
+## [0.0.170] - 2026-02-24
+
+This release represents a major milestone in the Babysitter project, featuring a complete architectural overhaul of the hook system, the introduction of Docker as the primary deployment method, and significant improvements to observability and developer experience. The release includes 13 new features, 22 bug fixes, 9 improvements, and several breaking changes that modernize the system's core capabilities.
+
+### Breaking Changes
+
+- **VS Code extension has been fully removed** - Docker is now the primary deployment method, providing better isolation and consistency across environments
+- **Breakpoints service has been completely removed** from the system
+- **Hook invocation mechanism changed** from shell scripts to SDK CLI commands for better reliability and maintainability
+- **Completion secret renamed to completion proof** throughout the API for clearer semantics
+- **Stop hook event registration changed** from SessionEnd to Stop for correct lifecycle handling
+- **Profile operations must use CLI commands exclusively** - direct SDK usage is no longer supported
+
+### Deprecations
+
+- VS Code extension deprecated in favor of Docker deployment
+- Shell script wrappers in `babysit/scripts` removed in favor of CLI commands
+- Legacy hook discovery mechanism replaced with JSDoc-based process discovery
+
+### Added
+
+#### Core Features
+- **Profiles SDK module** with CLI commands for managing user and project profiles
+- **Observe command** for plugin management and monitoring
+- **Doctor command** with HTML reports for comprehensive run diagnostics and health checks
+- **Yolo command** for rapid development workflows
+- **Process-driven skill and agent discovery** using JSDoc markers for better extensibility
+- **Harness adapter system** for flexible session binding across different Claude environments
+  - Auto-detection of harness environment when binding sessions
+- **Session transcript capture and verification** for full orchestration lifecycle tracking
+  - Structural transcript parsing for reliable stop hook verification
+- **Support for persisting initial prompt** in `run.json` and `RUN_CREATED` events
+
+#### Infrastructure
+- **Docker support** as the primary deployment method with comprehensive E2E testing
+- **Staging publish workflow** for better release management
+
+#### UI
+- **Revamped UI components** with modern Sci-Fi neon theme
+
+### Fixed
+
+#### Hook System
+- **Profile operations** now require CLI commands and never use SDK directly for consistency
+- **Stop hook** no longer bails on empty prompts when run is bound to a session
+- **Stop hook** now uses `last_assistant_message` fallback for better reliability
+- **Stop hook** registered on Stop event instead of SessionEnd for correct lifecycle handling
+- **Stop hook skill context** improved by excluding babysit and showing full paths
+- **Session-start hook** now creates baseline state file proactively
+- **Session-start hook** prevents hanging by ensuring clean stdin EOF handling
+- **Session-start hook** installs babysitter CLI from correct SDK version
+- **Hook decision output** now uses 'approve' instead of 'allow' for clarity
+
+#### State Management
+- **State cache** is now rebuilt after terminal events ensuring data consistency
+
+#### CLI & Build
+- **CLI exit codes** are now properly propagated via `process.exitCode`
+- **Plugin version** is now derived dynamically instead of being hardcoded
+- **Build system fixes** including rollup workarounds and npm optional dependencies
+
+#### Discovery & Execution
+- **Discovery bloat** removed from `run:iterate` with compacted `run:create` output
+- **Irrelevant specialization skills** excluded from discovery with capped summary length
+- **Harness CLI flag** is now respected for adapter selection in `run:create`
+- **Run directory resolution** improved with doubled `.a5c` path collapsing
+
+#### Docker & Permissions
+- **Workspace** is now world-writable for Docker UID mismatch handling
+- **File permission issues** resolved with chmod on copied Claude session directories
+
+#### Testing
+- **Session transcript format handling** fixed for real Claude Code output
+- **Multiple fixes for stop hook verification tests** in non-interactive mode
+- **Multiple fixes for E2E orchestration tests** including credentials and fixtures
+
+### Improved
+
+#### Architecture
+- **Hook system refactored** from shell scripts to SDK CLI commands for better maintainability
+- **Session binding** now auto-configures when harness and session-id are provided
+- **Discovery expanded** to agents and processes for broader capability coverage
+
+#### Observability
+- **Comprehensive diagnostic logging** added throughout stop hook execution paths
+- **Doctor command enhanced** with hook execution health diagnostics
+- **Run verification** made more resilient with better error handling and diagnostics
+
+#### Testing & Documentation
+- **E2E test coverage** significantly expanded for hooks, profiles, and orchestration
+- **Documentation updated** across commands, orchestration rules, and common mistakes
+- **Command files rewritten** with improved structure and closed process gaps
+
+---
+
+
 ## [0.0.169] - 2026-02-19
 - No notable changes.
 
@@ -107,7 +203,6 @@ Historical release entries below are preserved for reference but the extension w
 
 - No unreleased changes.
 
-
 ## [0.0.158] - 2026-02-02
 - No notable changes.
 
@@ -162,7 +257,6 @@ Historical release entries below are preserved for reference but the extension w
 
 
 - No unreleased changes.
-
 
 ## [0.0.151] - 2026-01-30
 - No notable changes.
@@ -362,7 +456,6 @@ Historical release entries below are preserved for reference but the extension w
 
 
 - No unreleased changes.
-
 
 ## [0.0.126] - 2026-01-25
 - No notable changes.
@@ -650,7 +743,6 @@ Historical release entries below are preserved for reference but the extension w
 
 
 - No unreleased changes.
-
 
 ## [0.0.90] - 2026-01-24
 - No notable changes.
@@ -1006,7 +1098,6 @@ Historical release entries below are preserved for reference but the extension w
 
 ## [0.0.46] - 2026-01-21
 - No notable changes.
-
 
 
 - No unreleased changes.
