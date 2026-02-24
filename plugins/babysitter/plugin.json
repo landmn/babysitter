@@ -1,7 +1,7 @@
 {
   "name": "babysitter",
   "version": "4.0.139",
-  "sdkVersion": "0.0.170-staging.b9ce0768",
+  "sdkVersion": "0.0.170-staging.c07a802c",
   "description": "Orchestrate complex, multi-step workflows with event-sourced state management, hook-based extensibility, and human-in-the-loop approval",
   "author": "a5c.ai",
   "license": "MIT",
