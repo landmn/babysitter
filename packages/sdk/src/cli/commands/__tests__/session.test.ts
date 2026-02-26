@@ -159,6 +159,7 @@ describe('session commands', () => {
 
     it('reads state correctly', async () => {
       const logSpy = vi.spyOn(console, 'log');
+      logSpy.mockClear();
 
       const result = await handleSessionState({
         sessionId,
@@ -179,6 +180,7 @@ describe('session commands', () => {
 
     it('returns not-found for missing session', async () => {
       const logSpy = vi.spyOn(console, 'log');
+      logSpy.mockClear();
 
       const result = await handleSessionState({
         sessionId: 'non-existent-session',
