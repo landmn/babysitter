@@ -12,7 +12,7 @@
 
 [x] https://github.com/dsifry/metaswarm
 
-[ ] https://github.com/SnapdragonPartners/maestro
+[x] https://github.com/SnapdragonPartners/maestro
 
 [ ] https://github.com/automazeio/ccpm
 
