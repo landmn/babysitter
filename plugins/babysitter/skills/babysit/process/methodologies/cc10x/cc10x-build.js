@@ -225,7 +225,7 @@ const integrationVerifyTask = defineTask('cc10x-build-integration-verify', (args
  *
  * Agent chain: component-builder -> [code-reviewer || silent-failure-hunter] -> integration-verifier
  *
- * Attribution: Adapted from https://github.com/romiluz13/cc10x by Romi Luz
+ * Attribution: Adapted from https://github.com/romiluz13/cc10x by Rom Iluz
  */
 export async function process(inputs, ctx) {
   const {
@@ -360,7 +360,7 @@ export async function process(inputs, ctx) {
     metadata: {
       processId: 'methodologies/cc10x/cc10x-build',
       attribution: 'https://github.com/romiluz13/cc10x',
-      author: 'Romi Luz',
+      author: 'Rom Iluz',
       timestamp: ctx.now()
     }
   };

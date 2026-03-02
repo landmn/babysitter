@@ -79,4 +79,4 @@ Plans created by the PLAN workflow are saved to `docs/plans/` and referenced in 
 
 ## Attribution
 
-Adapted from [CC10X](https://github.com/romiluz13/cc10x) by Romi Luz.
+Adapted from [CC10X](https://github.com/romiluz13/cc10x) by Rom Iluz.

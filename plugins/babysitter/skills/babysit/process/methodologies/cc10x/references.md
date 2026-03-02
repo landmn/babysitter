@@ -3,7 +3,7 @@
 ## Primary Source
 
 - **Repository**: [https://github.com/romiluz13/cc10x](https://github.com/romiluz13/cc10x)
-- **Author**: Romi Luz
+- **Author**: Rom Iluz
 - **Description**: Intelligent orchestration system for Claude Code that automatically detects user intent and dispatches appropriate agents with specialized skills
 
 ## Concepts Adapted
@@ -58,4 +58,4 @@ The following CC10X concepts have been adapted into babysitter process definitio
 
 ## Acknowledgment
 
-This adaptation brings CC10X's intelligent workflow orchestration patterns into the babysitter process framework. All credit for the original concepts, terminology, and design philosophy belongs to Romi Luz and the CC10X project contributors.
+This adaptation brings CC10X's intelligent workflow orchestration patterns into the babysitter process framework. All credit for the original concepts, terminology, and design philosophy belongs to Rom Iluz and the CC10X project contributors.

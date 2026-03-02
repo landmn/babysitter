@@ -139,7 +139,7 @@ const debugVerifyTask = defineTask('cc10x-debug-verify', (args, taskCtx) => ({
  *
  * Agent chain: bug-investigator -> code-reviewer -> integration-verifier
  *
- * Attribution: Adapted from https://github.com/romiluz13/cc10x by Romi Luz
+ * Attribution: Adapted from https://github.com/romiluz13/cc10x by Rom Iluz
  */
 export async function process(inputs, ctx) {
   const {
@@ -241,7 +241,7 @@ export async function process(inputs, ctx) {
     metadata: {
       processId: 'methodologies/cc10x/cc10x-debug',
       attribution: 'https://github.com/romiluz13/cc10x',
-      author: 'Romi Luz',
+      author: 'Rom Iluz',
       timestamp: ctx.now()
     }
   };

@@ -141,7 +141,7 @@ const reviewGateTask = defineTask('cc10x-plan-review-gate', (args, taskCtx) => (
  *
  * Agent: planner (with github-researcher for research)
  *
- * Attribution: Adapted from https://github.com/romiluz13/cc10x by Romi Luz
+ * Attribution: Adapted from https://github.com/romiluz13/cc10x by Rom Iluz
  */
 export async function process(inputs, ctx) {
   const {
@@ -220,7 +220,7 @@ export async function process(inputs, ctx) {
     metadata: {
       processId: 'methodologies/cc10x/cc10x-plan',
       attribution: 'https://github.com/romiluz13/cc10x',
-      author: 'Romi Luz',
+      author: 'Rom Iluz',
       timestamp: ctx.now()
     }
   };

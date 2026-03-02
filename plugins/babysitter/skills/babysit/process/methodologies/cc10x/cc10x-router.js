@@ -160,7 +160,7 @@ const remediationTask = defineTask('cc10x-remediation', (args, taskCtx) => ({
  * Workflow DAG (forward-only, no cycles):
  * loadMemory -> detectIntent -> [workflow execution] -> validateContract -> updateMemory
  *
- * Attribution: Adapted from https://github.com/romiluz13/cc10x by Romi Luz
+ * Attribution: Adapted from https://github.com/romiluz13/cc10x by Rom Iluz
  *
  * @param {Object} inputs - Process inputs
  * @param {string} inputs.request - The user's development request
@@ -433,7 +433,7 @@ export async function process(inputs, ctx) {
     metadata: {
       processId: 'methodologies/cc10x/cc10x-router',
       attribution: 'https://github.com/romiluz13/cc10x',
-      author: 'Romi Luz',
+      author: 'Rom Iluz',
       timestamp: ctx.now()
     }
   };

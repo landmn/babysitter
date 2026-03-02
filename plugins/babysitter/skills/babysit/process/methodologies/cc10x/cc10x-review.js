@@ -168,7 +168,7 @@ const synthesizeReviewTask = defineTask('cc10x-review-synthesize', (args, taskCt
  *
  * Agent: code-reviewer (single agent, multi-dimensional)
  *
- * Attribution: Adapted from https://github.com/romiluz13/cc10x by Romi Luz
+ * Attribution: Adapted from https://github.com/romiluz13/cc10x by Rom Iluz
  */
 export async function process(inputs, ctx) {
   const {
@@ -226,7 +226,7 @@ export async function process(inputs, ctx) {
     metadata: {
       processId: 'methodologies/cc10x/cc10x-review',
       attribution: 'https://github.com/romiluz13/cc10x',
-      author: 'Romi Luz',
+      author: 'Rom Iluz',
       timestamp: ctx.now()
     }
   };
