@@ -2,7 +2,7 @@
 
 [x] https://github.com/pcvelz/superpowers
 
-[ ] https://github.com/bmad-code-org/BMAD-METHOD 
+[x] https://github.com/bmad-code-org/BMAD-METHOD
 
 [ ] https://github.com/steveyegge/gastown 
 
