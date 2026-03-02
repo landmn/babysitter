@@ -71,7 +71,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-13, windows-2022]
-        node: [18, 20]
+        node: [20, 22]
     defaults:
       run:
         shell: bash
