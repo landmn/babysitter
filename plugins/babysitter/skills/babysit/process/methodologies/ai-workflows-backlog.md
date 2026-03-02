@@ -18,7 +18,7 @@
 
 [x] https://github.com/maxritter/pilot-shell
 
-[ ] https://github.com/ruvnet/ruflo
+[x] https://github.com/ruvnet/ruflo
 
 [ ] https://github.com/huytieu/COG-second-brain
 
