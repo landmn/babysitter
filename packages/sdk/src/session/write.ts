@@ -151,7 +151,7 @@ export function isoToEpochSeconds(isoTimestamp: string): number | null {
 
 /**
  * Calculate iteration duration and update times array.
- * Keeps only the last 3 durations.
+ * Keeps only the last 10 durations for runaway loop detection.
  */
 export function updateIterationTimes(
   existingTimes: number[],
@@ -171,16 +171,16 @@ export function updateIterationTimes(
   }
 
   const newTimes = [...existingTimes, duration];
-  // Keep only last 3
-  return newTimes.slice(-3);
+  // Keep only last 10
+  return newTimes.slice(-10);
 }
 
 /**
  * Check if average iteration time indicates runaway loop.
- * Returns true if average of last 3 iterations is <= 15 seconds.
+ * Returns true if at least 10 consecutive iterations averaged <= 15 seconds.
  */
 export function isIterationTooFast(iterationTimes: number[]): boolean {
-  if (iterationTimes.length < 3) {
+  if (iterationTimes.length < 10) {
     return false;
   }
 

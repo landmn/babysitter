@@ -353,13 +353,13 @@ describe('session:check-iteration', () => {
   // ── 5. Iteration too fast (runaway loop detection) ────────────────
 
   describe('iteration too fast (runaway loop)', () => {
-    it('returns shouldContinue=false with reason=iteration_too_fast when avg <= 15s', async () => {
-      // iteration >= 5 triggers timing check; provide 3 fast times
+    it('returns shouldContinue=false with reason=iteration_too_fast when avg <= 15s over 10 iterations', async () => {
+      // iteration >= 5 triggers timing check; provide 10 fast times (need 10 consecutive)
       await createSessionFile(
         makeState({
-          iteration: 6,
+          iteration: 15,
           maxIterations: 256,
-          iterationTimes: [5, 5, 5],
+          iterationTimes: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
           lastIterationAt: new Date(Date.now() - 5000).toISOString().replace(/\.\d{3}Z$/, 'Z'),
         }),
         'Fast prompt'
@@ -380,13 +380,34 @@ describe('session:check-iteration', () => {
       expect(output.stopMessage).toMatch(/fast/i);
     });
 
-    it('includes iteration, maxIterations, runId, prompt in too-fast response', async () => {
+    it('does NOT trigger too-fast with only 3 fast iterations (needs 10)', async () => {
       await createSessionFile(
         makeState({
           iteration: 8,
+          maxIterations: 256,
+          iterationTimes: [5, 5, 5],
+          lastIterationAt: new Date(Date.now() - 5000).toISOString().replace(/\.\d{3}Z$/, 'Z'),
+        }),
+        'Fast prompt'
+      );
+
+      await handleSessionCheckIteration({
+        sessionId,
+        stateDir,
+        json: true,
+      });
+
+      const output = capturedJson();
+      expect(output.shouldContinue).toBe(true);
+    });
+
+    it('includes iteration, maxIterations, runId, prompt in too-fast response', async () => {
+      await createSessionFile(
+        makeState({
+          iteration: 16,
           maxIterations: 100,
           runId: 'run-fast',
-          iterationTimes: [3, 3, 3],
+          iterationTimes: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
           lastIterationAt: new Date(Date.now() - 3000).toISOString().replace(/\.\d{3}Z$/, 'Z'),
         }),
         'Speedy prompt'
@@ -399,7 +420,7 @@ describe('session:check-iteration', () => {
       });
 
       const output = capturedJson();
-      expect(output.iteration).toBe(8);
+      expect(output.iteration).toBe(16);
       expect(output.maxIterations).toBe(100);
       expect(output.runId).toBe('run-fast');
       expect(output.prompt).toBe('Speedy prompt');
@@ -533,12 +554,12 @@ describe('session:check-iteration', () => {
     it('iteration < 5 skips timing update but still checks existing fast times', async () => {
       // iteration=4 < 5 threshold means updateIterationTimes is NOT called,
       // but isIterationTooFast still runs on existing times.
-      // With [1, 1, 1] (avg=1 <= 15), it should detect runaway.
+      // With 10 fast times (avg=1 <= 15), it should detect runaway.
       await createSessionFile(
         makeState({
           iteration: 4,
           maxIterations: 256,
-          iterationTimes: [1, 1, 1],
+          iterationTimes: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
           lastIterationAt: new Date(Date.now() - 1000).toISOString().replace(/\.\d{3}Z$/, 'Z'),
         }),
         'Early prompt'
@@ -552,13 +573,13 @@ describe('session:check-iteration', () => {
 
       const output = capturedJson();
       // Even though iteration < 5 skips the timing UPDATE, the existing
-      // iterationTimes [1,1,1] still trigger isIterationTooFast
+      // iterationTimes (10 entries) still trigger isIterationTooFast
       expect(output.shouldContinue).toBe(false);
       expect(output.reason).toBe('iteration_too_fast');
     });
 
-    it('iteration < 5 with fewer than 3 times continues (isIterationTooFast needs 3)', async () => {
-      // isIterationTooFast returns false when length < 3
+    it('iteration < 5 with fewer than 10 times continues (isIterationTooFast needs 10)', async () => {
+      // isIterationTooFast returns false when length < 10
       await createSessionFile(
         makeState({
           iteration: 3,

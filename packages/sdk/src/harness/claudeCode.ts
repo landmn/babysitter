@@ -458,9 +458,10 @@ async function handleStopHookImpl(args: HookHandlerArgs): Promise<number> {
     }
 
     if (!runState) {
+      log.warn(`Run state unknown for ${runId} — allowing exit but preserving session file for recovery`);
       if (verbose) {
         process.stderr.write(
-          `[hook:run stop] Run state is empty for ${runId}; run may be misconfigured\n`,
+          `[hook:run stop] Run state is empty for ${runId}; run may be misconfigured — preserving session file\n`,
         );
       }
       if (runId) {
@@ -474,7 +475,9 @@ async function handleStopHookImpl(args: HookHandlerArgs): Promise<number> {
           hasPromise,
         });
       }
-      await cleanupSession(filePath);
+      // Do NOT delete session file here — the run state may be temporarily
+      // unreadable (race with run:create, disk issue, etc.). Preserving the
+      // file allows session:associate or doctor to re-bind and recover.
       process.stdout.write("{}\n");
       return 0;
     }
