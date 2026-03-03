@@ -1,7 +1,6 @@
 ---
 description: Launch the babysitter observer dashboard. Installs and runs the real-time observer UI that watches babysitter runs, displaying task progress, journal events, and orchestration state in your browser.
 argument-hint: [--watch-dir <dir>]
-allowed-tools: Read, Grep, Write, Task, Bash, Edit, Grep, Glob, WebFetch, WebSearch, Search, AskUserQuestion, TodoWrite, TodoRead, BashOutput, Skill, KillShell, MultiEdit, LS
 ---
 
 Run the babysitter observer dashboard:
