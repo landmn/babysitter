@@ -39,6 +39,5 @@
     "quality-convergence",
     "agent",
     "LLM"
-  ],
-  "sdkVersion": "0.0.171"
+  ]
 }
