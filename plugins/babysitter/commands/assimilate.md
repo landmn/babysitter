@@ -1,7 +1,6 @@
 ---
 description: Assimilate an external methodology, harness, or specification into babysitter process definitions with skills and agents.
 argument-hint: Target to assimilate (e.g. repo URL, harness name, or spec path)
-allowed-tools: Read, Grep, Write, Task, Bash, Edit, Grep, Glob, WebFetch, WebSearch, Search, AskUserQuestion, TodoWrite, TodoRead, BashOutput, Skill, KillShell, MultiEdit, LS
 ---
 
 Invoke the babysitter:babysit skill (using the Skill tool) and follow its instructions (SKILL.md).

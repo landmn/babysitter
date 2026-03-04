@@ -1,7 +1,6 @@
 ---
 description: Resume orchestrating of a babysitter run. use this command to resume babysitting a complex workflow.
 argument-hint: Specific run to resume
-allowed-tools: Read, Grep, Write, Task, Bash, Edit, Grep, Glob, WebFetch, WebSearch, Search, AskUserQuestion, TodoWrite, TodoRead, BashOutput, Skill, KillShell, MultiEdit, LS
 ---
 
 Invoke the babysitter:babysit skill (using the Skill tool) and follow its instructions (SKILL.md). to resume a run.
