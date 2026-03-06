@@ -21,6 +21,15 @@
       "packagePath": "plugins/sound-hooks",
       "tags": ["hooks", "sound", "notifications", "ux"],
       "author": "a5c-ai"
+    },
+    "github-actions-cicd": {
+      "name": "github-actions-cicd",
+      "description": "Set up babysitter-powered GitHub Actions workflows with triggers on issue comments, PR events, labels, schedules, and manual dispatch. Based on docs/github-actions-setup.md.",
+      "latestVersion": "1.0.0",
+      "versions": ["1.0.0"],
+      "packagePath": "plugins/github-actions-cicd",
+      "tags": ["cicd", "github-actions", "automation", "devops", "workflows"],
+      "author": "a5c-ai"
     }
   }
 }
