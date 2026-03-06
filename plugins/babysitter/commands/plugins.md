@@ -241,3 +241,15 @@ All commands accept `--json` for machine-readable output and `--global|--project
 | `plugin:list-installed` | `--global\|--project` | List all installed plugins |
 | `plugin:update-registry` | `--plugin-name`, `--plugin-version`, `--marketplace-name`, `--global\|--project` | Register or update a plugin entry |
 | `plugin:remove-from-registry` | `--plugin-name`, `--global\|--project` | Remove a plugin entry from the registry |
+
+## After Plugin Work: Contribute Back
+
+After working with plugins, prompt the user to share improvements or report issues:
+
+- **Improved a plugin's install/configure/uninstall instructions**: `/babysitter:contrib library contribution: improved [plugin-name] [install|configure|uninstall] instructions`
+- **Created a new plugin**: `/babysitter:contrib library contribution: new plugin [plugin-name] -- [description]`
+- **Found a bug in a plugin or the plugin system**: `/babysitter:contrib bug report: [description, e.g. "plugin:update-registry fails when marketplace hasn't been cloned"]`
+- **Plugin install/configure instructions were confusing or wrong**: `/babysitter:contrib bug report: [plugin-name] install instructions [description of what was wrong]`
+- **Have an idea for a new plugin**: `/babysitter:contrib feature request: plugin idea -- [description]`
+
+Even reporting that a plugin's instructions were unclear helps improve it for the next user.
