@@ -373,7 +373,13 @@ function parseArgs(argv: string[]): ParsedArgs {
     }
     // Session command flags
     if (arg === "--session-id") {
-      parsed.sessionId = expectFlagValue(rest, ++i, "--session-id");
+      // Tolerate empty/missing value — the harness adapter can auto-detect
+      // session ID from CLAUDE_ENV_FILE or CLAUDE_SESSION_ID env var.
+      const next = rest[i + 1];
+      if (next && !next.startsWith("-")) {
+        parsed.sessionId = next;
+        i++;
+      }
       continue;
     }
     if (arg === "--state-dir") {
@@ -2167,7 +2173,19 @@ export function createBabysitterCli() {
         if (parsed.command === "task:show") {
           return await handleTaskShow(parsed);
         }
-        // Session commands
+        // Session commands — auto-resolve sessionId via harness adapter if not
+        // explicitly provided (e.g. from CLAUDE_ENV_FILE written by session-start hook).
+        if (!parsed.sessionId && parsed.command?.startsWith("session:")) {
+          const sessionAdapter = parsed.harness
+            ? getAdapterByName(parsed.harness)
+            : getAdapter();
+          if (sessionAdapter) {
+            const resolved = sessionAdapter.resolveSessionId(parsed);
+            if (resolved) {
+              parsed.sessionId = resolved;
+            }
+          }
+        }
         if (parsed.command === "session:init") {
           return await handleSessionInit({
             sessionId: parsed.sessionId,

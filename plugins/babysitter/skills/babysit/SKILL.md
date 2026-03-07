@@ -100,6 +100,8 @@ Before building the process, check for an existing user profile to personalize t
 after the interview phase, create the complete custom process files (js and jsons) for the run according to the Process Creation Guidelines and methodologies section. also install the babysitter-sdk inside .a5c if it is not already installed. (install it in .a5c/package.json if it is not already installed, make sure to use the latest version)
 you must abide the syntax and structure of the process files from the process library.
 
+**IMPORTANT — Path resolution**: Always use **absolute paths** for `--entry` when calling `run:create`, and always run the CLI from the **project root** directory (not from `.a5c/`). Using relative paths while CWD is inside `.a5c/` causes doubled paths like `.a5c/.a5c/runs/` or `.a5c/.a5c/processes/`.
+
 **User profile awareness**: If a user profile was loaded in the User Profile Integration step, use it to inform process design — adjust breakpoint density per the user's tolerance level, select agents/skills the user prefers, and match the process complexity to the user's expertise.
 
 **IMPORTANT — Profile I/O in processes**: When generating process files, all profile read/write/merge operations MUST use the babysitter CLI commands (`babysitter profile:read`, `profile:write`, `profile:merge`, `profile:render`). Never instruct agents to import or call SDK profile functions (`readUserProfile`, `writeUserProfile`, etc.) directly. The CLI handles atomic writes, directory creation, and markdown generation automatically.
@@ -119,7 +121,6 @@ $CLI run:create \
   --inputs <file> \
   --prompt "$PROMPT" \
   --harness claude-code \
-  --session-id "${CLAUDE_SESSION_ID}" \
   --plugin-root "${CLAUDE_PLUGIN_ROOT}" \
   --json
 ```
@@ -128,11 +129,11 @@ $CLI run:create \
 - `--process-id <id>` — unique identifier for the process definition
 - `--entry <path>#<export>` — path to the process JS file and its named export (e.g., `./my-process.js#process`)
 - `--prompt "$PROMPT"` — the user's initial prompt/request text
-- `--harness claude-code` — activates Claude Code session binding (init + associate in one step)
-- `--session-id "${CLAUDE_SESSION_ID}"` — the current Claude Code session ID (available as env var)
+- `--harness claude-code` — activates Claude Code session binding (init + associate in one step). The session ID is auto-detected from `CLAUDE_ENV_FILE` (written by the session-start hook) or `CLAUDE_SESSION_ID` env var.
 - `--plugin-root "${CLAUDE_PLUGIN_ROOT}"` — plugin root directory for state file resolution
 
 **Optional flags:**
+- `--session-id <id>` — explicitly provide session ID (normally auto-detected by `--harness claude-code`)
 - `--inputs <file>` — path to a JSON file with process inputs
 - `--run-id <id>` — override auto-generated run ID
 - `--runs-dir <dir>` — override runs directory (default: `.a5c/runs`)
@@ -142,7 +143,7 @@ This single command creates the run AND binds the session (initializing the stop
 **For resuming existing runs:**
 
 ```bash
-$CLI session:resume --session-id "${CLAUDE_SESSION_ID}" \
+$CLI session:resume \
   --state-dir "${CLAUDE_PLUGIN_ROOT}/skills/babysit/state" \
   --run-id <runId> --runs-dir .a5c/runs --json
 ```
@@ -388,7 +389,7 @@ export const skillTask = defineTask('analyzer-skill', (args, taskCtx) => ({
 ```bash
 $CLI run:create --process-id <id> --entry <path>#<export> --inputs <file> \
   --prompt "$PROMPT" --harness claude-code \
-  --session-id "${CLAUDE_SESSION_ID}" --plugin-root "${CLAUDE_PLUGIN_ROOT}" --json
+  --plugin-root "${CLAUDE_PLUGIN_ROOT}" --json
 ```
 
 **Check status:**
@@ -504,7 +505,7 @@ CRITICAL RULE: do not use the babysit skill inside the delegated tasks. if you a
 
 CRITICAL RULE: Never build a wrapper, python or helper scripts to orchestrate the runs. Use the CLI to drive the orchestration loop and never loop programmatically.
 
-CRITICAL RULE: Never fallback to simpler execution if the user activated this skill. persist in executing the orchestration itself rather than simplifying the execution by bypassing the process above - you must create a valid process js file, create a run (with --harness claude-code --session-id to bind the session), then iterate the run until it is completed.
+CRITICAL RULE: Never fallback to simpler execution if the user activated this skill. persist in executing the orchestration itself rather than simplifying the execution by bypassing the process above - you must create a valid process js file, create a run (with --harness claude-code to bind the session), then iterate the run until it is completed.
 
 CRITICAL RULE: After run:create or run-session association and after each effect is posted, you MUST stop the session and return control. Do NOT proceed to the next run:iterate in the same session turn. The stop-hook will call you back to continue. Running multiple iterations in a single session turn bypasses the hook loop and breaks the orchestration model.
 
