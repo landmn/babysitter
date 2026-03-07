@@ -2173,7 +2173,19 @@ export function createBabysitterCli() {
         if (parsed.command === "task:show") {
           return await handleTaskShow(parsed);
         }
-        // Session commands
+        // Session commands — auto-resolve sessionId via harness adapter if not
+        // explicitly provided (e.g. from CLAUDE_ENV_FILE written by session-start hook).
+        if (!parsed.sessionId && parsed.command?.startsWith("session:")) {
+          const sessionAdapter = parsed.harness
+            ? getAdapterByName(parsed.harness)
+            : getAdapter();
+          if (sessionAdapter) {
+            const resolved = sessionAdapter.resolveSessionId(parsed);
+            if (resolved) {
+              parsed.sessionId = resolved;
+            }
+          }
+        }
         if (parsed.command === "session:init") {
           return await handleSessionInit({
             sessionId: parsed.sessionId,
