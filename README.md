@@ -28,6 +28,7 @@ https://github.com/user-attachments/assets/8c3b0078-9396-48e8-aa43-5f40da30c20b
 - [What is Babysitter?](#what-is-babysitter)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
+- [First Steps](#first-steps)
 - [Quick Start](#quick-start)
 - [How It Works](#how-it-works)
 - [Why Babysitter?](#why-babysitter)
@@ -77,6 +78,42 @@ It includes Codex hook wiring, slash command dispatch, and orchestration harness
 
 ---
 
+## First Steps
+
+After installation, set up your environment:
+
+### 1. Configure Your Profile (One-Time)
+
+```bash
+/babysitter:user-install
+```
+
+This creates your personal profile with:
+- Breakpoint preferences (how much oversight you want)
+- Tool preferences and communication style
+- Expertise areas for better process matching
+
+### 2. Set Up Your Project
+
+```bash
+/babysitter:project-install
+```
+
+This analyzes your codebase and configures:
+- Project-specific workflows
+- Test frameworks and CI/CD integration
+- Tech stack preferences
+
+### 3. Verify Setup
+
+```bash
+/babysitter:doctor
+```
+
+Run diagnostics to confirm everything is working.
+
+---
+
 ## Quick Start
 
 ```bash
@@ -91,26 +128,74 @@ Use the babysitter skill to implement user authentication with TDD
 
 Claude will create an orchestration run, execute tasks step-by-step, handle quality checks and approvals, and continue until completion.
 
+### Choose Your Mode
+
+| Mode | Command | When to Use |
+|------|---------|-------------|
+| **Interactive** | `/babysitter:call` | Learning, critical workflows - pauses for approval |
+| **Autonomous** | `/babysitter:yolo` | Trusted tasks - full auto, no breakpoints |
+| **Planning** | `/babysitter:plan` | Review process before executing |
+| **Continuous** | `/babysitter:forever` | Monitoring, periodic tasks - runs indefinitely |
+
+### Utility Commands
+
+| Command | Purpose |
+|---------|----------|
+| `/babysitter:doctor` | Diagnose run health and issues |
+| `/babysitter:observe` | Launch real-time monitoring dashboard |
+| `/babysitter:resume` | Continue an interrupted run |
+
 ---
 
 ## How It Works
 
 ```
-+-----------------------------------------------------------------+
-|                     Babysitter Loop                              |
-|                                                                  |
-|   +----------+     +----------+     +----------+     +----------+|
-|   | Iterate  | --> |   Get    | --> | Execute  | --> |   Post   ||
-|   |          |     | Effects  |     |  Tasks   |     | Results  ||
-|   +----------+     +----------+     +----------+     +----------+|
-|        |                                               |         |
-|        +----------------- repeat <---------------------+         |
-+-----------------------------------------------------------------+
++==============================================================================+
+|                        BABYSITTER ORCHESTRATION                               |
++==============================================================================+
+|                                                                               |
+|  1. SETUP                           2. ORCHESTRATION LOOP                     |
+|  +-----------------+                +-------------------------------------+   |
+|  | /user-install   |                |                                     |   |
+|  | (one-time)      |                |   +----------+    +-----------+     |   |
+|  +-----------------+                |   | Process  |--->| Get Tasks |     |   |
+|          |                          |   | Iterate  |    | (Effects) |     |   |
+|          v                          |   +----------+    +-----------+     |   |
+|  +-----------------+                |        ^               |            |   |
+|  | /project-install|                |        |               v            |   |
+|  | (per project)   |                |   +----------+    +-----------+     |   |
+|  +-----------------+                |   | Quality  |<---| Execute   |     |   |
+|          |                          |   | Check    |    | Tasks     |     |   |
+|          v                          |   +----------+    +-----------+     |   |
+|  +-----------------+                |        |                            |   |
+|  | /babysitter:call|                |        v                            |   |
+|  | (start run)     |                |   +-----------+                     |   |
+|  +-----------------+                |   | Target    |---> COMPLETE        |   |
+|                                     |   | Met?      |                     |   |
+|                                     |   +-----------+                     |   |
+|                                     |        | NO                         |   |
+|  3. PERSISTENCE                     |        v                            |   |
+|  +-----------------+                |   +-----------+                     |   |
+|  | .a5c/runs/      |                |   | Improve & |----+                |   |
+|  | - journal/      |<---------------|   | Iterate   |    | (loop)        |   |
+|  | - tasks/        |                |   +-----------+----+                |   |
+|  | - state.json    |                +-------------------------------------+   |
+|  +-----------------+                                                          |
+|        |                            4. HUMAN-IN-THE-LOOP                      |
+|        v                            +-------------------------------------+   |
+|  +-----------------+                | Breakpoints pause for approval      |   |
+|  | Resume anytime  |                | /babysitter:yolo skips breakpoints  |   |
+|  | /babysitter:    |                | /babysitter:observe for monitoring  |   |
+|  |   resume        |                +-------------------------------------+   |
+|  +-----------------+                                                          |
++===============================================================================+
 ```
 
-**Each iteration:** Advance process -> Get pending effects -> Execute tasks -> Record outcomes -> Repeat until complete.
-
-**Everything is recorded:** `.a5c/runs/<runId>/` contains journal, tasks, and state. Pause, resume, or recover at any point.
+**Key Concepts:**
+- **Quality Convergence:** Define a target score (e.g., 80%), iterate until achieved
+- **Journal Persistence:** All state in `.a5c/runs/` - pause/resume anytime
+- **Breakpoints:** Human approval gates at critical decisions
+- **Effect Types:** agent, breakpoint, sleep, skill - different task kinds
 
 ---
 
@@ -168,9 +253,18 @@ See [CONTRIBUTING.md](https://github.com/a5c-ai/babysitter/blob/main/CONTRIBUTIN
 
 ## Community and Support
 
+- **Discord**: [Join our community](https://discord.gg/dHGkzxf48a) *(GitHub invite link)*
 - **GitHub Issues**: [Report bugs or request features](https://github.com/a5c-ai/babysitter/issues)
 - **GitHub Discussions**: [Ask questions and share ideas](https://github.com/a5c-ai/babysitter/discussions)
 - **npm**: [@a5c-ai/babysitter-sdk](https://www.npmjs.com/package/@a5c-ai/babysitter-sdk)
+
+### Community Tools
+
+| Tool | Description |
+|------|-------------|
+| [Observer Dashboard](https://github.com/yoavmayer/babysitter-observer-dashboard) | Real-time monitoring UI for parallel runs |
+| [Telegram Bot](https://github.com/a5c-ai/claude-code-telegram-bot) | Control sessions remotely |
+| [vibe-kanban](https://github.com/BloopAI/vibe-kanban) | Parallel process management |
 
 ### Star History
 
