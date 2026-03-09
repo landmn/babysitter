@@ -150,52 +150,59 @@ Claude will create an orchestration run, execute tasks step-by-step, handle qual
 ## How It Works
 
 ```
-+==============================================================================+
-|                        BABYSITTER ORCHESTRATION                               |
-+==============================================================================+
-|                                                                               |
-|  1. SETUP                           2. ORCHESTRATION LOOP                     |
-|  +-----------------+                +-------------------------------------+   |
-|  | /user-install   |                |                                     |   |
-|  | (one-time)      |                |   +----------+    +-----------+     |   |
-|  +-----------------+                |   | Process  |--->| Get Tasks |     |   |
-|          |                          |   | Iterate  |    | (Effects) |     |   |
-|          v                          |   +----------+    +-----------+     |   |
-|  +-----------------+                |        ^               |            |   |
-|  | /project-install|                |        |               v            |   |
-|  | (per project)   |                |   +----------+    +-----------+     |   |
-|  +-----------------+                |   | Quality  |<---| Execute   |     |   |
-|          |                          |   | Check    |    | Tasks     |     |   |
-|          v                          |   +----------+    +-----------+     |   |
-|  +-----------------+                |        |                            |   |
-|  | /babysitter:call|                |        v                            |   |
-|  | (start run)     |                |   +-----------+                     |   |
-|  +-----------------+                |   | Target    |---> COMPLETE        |   |
-|                                     |   | Met?      |                     |   |
-|                                     |   +-----------+                     |   |
-|                                     |        | NO                         |   |
-|  3. PERSISTENCE                     |        v                            |   |
-|  +-----------------+                |   +-----------+                     |   |
-|  | .a5c/runs/      |                |   | Improve & |----+                |   |
-|  | - journal/      |<---------------|   | Iterate   |    | (loop)        |   |
-|  | - tasks/        |                |   +-----------+----+                |   |
-|  | - state.json    |                +-------------------------------------+   |
-|  +-----------------+                                                          |
-|        |                            4. HUMAN-IN-THE-LOOP                      |
-|        v                            +-------------------------------------+   |
-|  +-----------------+                | Breakpoints pause for approval      |   |
-|  | Resume anytime  |                | /babysitter:yolo skips breakpoints  |   |
-|  | /babysitter:    |                | /babysitter:observe for monitoring  |   |
-|  |   resume        |                +-------------------------------------+   |
-|  +-----------------+                                                          |
-+===============================================================================+
++=============================================================================+
+|                         PROCESS ENFORCEMENT                                  |
++=============================================================================+
+|                                                                              |
+|  YOUR REQUEST                         YOUR PROCESS DEFINITION (JavaScript)   |
+|  +-----------------------+            +----------------------------------+   |
+|  | "Build REST API       |            | defineProcess('tdd-api', {       |   |
+|  |  with TDD, 80% quality"|           |   phases: [                      |   |
+|  +-----------+-----------+            |     { id: 'research',            |   |
+|              |                        |       tasks: [analyzeCodebase,   |   |
+|              v                        |                createSpecs] },   |   |
+|  +-----------------------+            |     { id: 'implement',           |   |
+|  | Babysitter selects or |            |       tasks: [writeTests,        |   |
+|  | generates process     |----------->|                writeCode] },     |   |
+|  +-----------------------+            |     { id: 'verify',              |   |
+|                                       |       gates: [testsPass,         |   |
+|                                       |                coverage80] }     |   |
+|  DETERMINISTIC EXECUTION              |   ],                             |   |
+|  (Process drives every step)          |   onGateFail: 'refine'           |   |
+|                                       | })                               |   |
+|  Phase: research                      +----------------------------------+   |
+|  +---------------------------+                     |                         |
+|  | [x] analyzeCodebase       |<--------------------+                         |
+|  | [x] createSpecs           |     Process defines WHAT runs                 |
+|  +-------------+-------------+                                               |
+|                |                                                             |
+|  Phase: implement                                                            |
+|  +-------------v-------------+                                               |
+|  | [x] writeTests            |     Babysitter enforces WHEN and HOW          |
+|  | [x] writeCode             |                                               |
+|  +-------------+-------------+                                               |
+|                |                                                             |
+|  Phase: verify                                                               |
+|  +-------------v-------------+                                               |
+|  | Gate: testsPass?     [x]  |     Quality gates defined IN the process      |
+|  | Gate: coverage >= 80% [x] |---> COMPLETE                                  |
+|  +---------------------------+                                               |
+|         | (gate fails)                                                       |
+|         v                                                                    |
+|  Process-defined refinement          JOURNAL (Event-Sourced)                 |
+|  (not a retry - a defined phase)     +-------------------------------+       |
+|                                      | Every task recorded immutably |       |
+|                                      | Deterministic replay anytime  |       |
+|                                      | Resume exactly where stopped  |       |
+|                                      +-------------------------------+       |
++=============================================================================+
 ```
 
 **Key Concepts:**
-- **Quality Convergence:** Define a target score (e.g., 80%), iterate until achieved
-- **Journal Persistence:** All state in `.a5c/runs/` - pause/resume anytime
-- **Breakpoints:** Human approval gates at critical decisions
-- **Effect Types:** agent, breakpoint, sleep, skill - different task kinds
+- **Process Enforcement:** Your workflow is defined in code - Babysitter enforces every step
+- **Deterministic Execution:** Same process definition = same execution sequence
+- **Quality Gates:** Standards defined in the process, not as an afterthought
+- **Event-Sourced Journal:** All state in `.a5c/runs/` - deterministic replay and resume
 
 ---
 
@@ -203,14 +210,14 @@ Claude will create an orchestration run, execute tasks step-by-step, handle qual
 
 | Traditional Approach | Babysitter |
 |---------------------|------------|
-| Run script once, hope it works | Iterate until quality target met |
+| Run script once, hope it works | Process enforces quality gates before completion |
 | Manual approval via chat | Structured breakpoints with context |
 | State lost on session end | Event-sourced, fully resumable |
 | Single task execution | Parallel execution, dependencies |
 | No audit trail | Complete journal of all events |
-| Fixed workflow | Process-driven, customizable |
+| Ad-hoc workflow | Deterministic, code-defined processes |
 
-**Key differentiators:** Deterministic replay, quality convergence, human-in-the-loop breakpoints, agent scoring, and parallel execution.
+**Key differentiators:** Process enforcement, deterministic replay, quality convergence, human-in-the-loop breakpoints, and parallel execution.
 
 ---
 
