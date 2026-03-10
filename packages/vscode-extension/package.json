@@ -6,6 +6,11 @@
   "description": "Orchestrate complex, multi-step AI workflows from VS Code",
   "extensionKind": ["workspace"],
   "keywords": ["babysitter", "orchestration", "workflow", "tdd", "quality", "agent"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/a5c-ai/babysitter.git",
+    "directory": "packages/vscode-extension"
+  },
   "engines": {
     "vscode": "^1.111.0"
   },
@@ -139,7 +144,9 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "compile": "tsc -p tsconfig.json --watch"
+    "compile": "tsc -p tsconfig.json --watch",
+    "package": "vsce package --no-dependencies",
+    "test": "node ../../node_modules/mocha/bin/mocha.js --ui tdd 'dist/__tests__/**/*.test.js' 'dist/unit/**/*.test.js'"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",

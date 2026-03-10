@@ -4,9 +4,12 @@ node_modules/**
 src/**
 dist/unit/**
 dist/__tests__/**
+dist/__mocks__/**
+.a5c/**
 .github/**
 .kanban/**
 tsconfig.json
 .eslintrc*
 .prettierrc*
 *.map
+*.vsix
