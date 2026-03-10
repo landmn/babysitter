@@ -1,0 +1,319 @@
+{
+  "id": "a5c-ai.babysitter",
+  "name": "Babysitter",
+  "version": "0.0.180",
+  "description": "Orchestrate complex multi-step AI workflows with quality gates, breakpoints, and event sourcing",
+  "publisher": "a5c-ai",
+  "icon": "icon.png",
+  "repository": "https://github.com/a5c-ai/babysitter",
+  "license": "MIT",
+  "keywords": [
+    "orchestration",
+    "workflow",
+    "automation",
+    "event-sourced",
+    "TDD",
+    "quality-convergence",
+    "breakpoints",
+    "human-in-the-loop",
+    "agent"
+  ],
+  "engines": {
+    "vscode": ">=1.110.0"
+  },
+  "chatParticipants": [
+    {
+      "id": "a5c-ai.babysitter",
+      "name": "babysitter",
+      "fullName": "Babysitter Orchestrator",
+      "description": "Orchestrate complex multi-step workflows with quality gates, breakpoints, and resumable event-sourced runs",
+      "isDefault": false,
+      "commands": [
+        {
+          "name": "implement",
+          "description": "Start a new orchestrated implementation run (TDD, multi-phase pipelines, quality convergence)"
+        },
+        {
+          "name": "resume",
+          "description": "Resume a paused or interrupted run from its last checkpoint"
+        },
+        {
+          "name": "status",
+          "description": "Check the status of a run, including current phase, pending tasks, and quality score"
+        },
+        {
+          "name": "list",
+          "description": "List all runs in the current workspace with their statuses"
+        },
+        {
+          "name": "processes",
+          "description": "List available process definitions from .a5c/processes/ and the built-in process library"
+        },
+        {
+          "name": "help",
+          "description": "Show usage examples, available process templates, and orchestration patterns"
+        }
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "id": "a5c-ai.babysitter.create-process",
+      "name": "create-process",
+      "description": "Create a new babysitter process definition file in .a5c/processes/",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Process identifier (used as processId and filename)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of what the process does"
+          },
+          "methodology": {
+            "type": "string",
+            "description": "Optional: methodology template to base the process on (tdd, scrum, kanban, bdd, ddd, xp, etc.)"
+          },
+          "qualityTarget": {
+            "type": "number",
+            "description": "Optional: minimum quality score threshold (0-100, default 80)"
+          }
+        },
+        "required": ["name", "description"]
+      }
+    },
+    {
+      "id": "a5c-ai.babysitter.list-processes",
+      "name": "list-processes",
+      "description": "List all available process definitions from .a5c/processes/ and the built-in process library",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Optional: filter by category (gsd, methodologies, specializations)"
+          }
+        }
+      }
+    },
+    {
+      "id": "a5c-ai.babysitter.dispatch-run",
+      "name": "dispatch-run",
+      "description": "Create and start a new orchestration run using the babysitter SDK",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "processId": {
+            "type": "string",
+            "description": "ID of the process definition to use"
+          },
+          "entry": {
+            "type": "string",
+            "description": "Path to the process entry file (e.g. .a5c/processes/my-process.js#process)"
+          },
+          "inputs": {
+            "type": "object",
+            "description": "Process inputs as a JSON object"
+          },
+          "inputsFile": {
+            "type": "string",
+            "description": "Optional: path to a JSON file containing process inputs"
+          }
+        },
+        "required": ["processId", "entry"]
+      }
+    },
+    {
+      "id": "a5c-ai.babysitter.check-status",
+      "name": "check-status",
+      "description": "Check the status of an existing run, including pending tasks, quality scores, and journal events",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "runId": {
+            "type": "string",
+            "description": "Run ID or path to the run directory under .a5c/runs/"
+          },
+          "showEvents": {
+            "type": "boolean",
+            "description": "Whether to include journal events in the response (default: false)"
+          }
+        },
+        "required": ["runId"]
+      }
+    },
+    {
+      "id": "a5c-ai.babysitter.run-iterate",
+      "name": "run-iterate",
+      "description": "Trigger a new orchestration iteration for an existing run, processing pending effects and advancing the workflow",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "runId": {
+            "type": "string",
+            "description": "Run ID or path to the run directory under .a5c/runs/"
+          },
+          "json": {
+            "type": "boolean",
+            "description": "Return iteration result as structured JSON (default: false)"
+          }
+        },
+        "required": ["runId"]
+      }
+    }
+  ],
+  "hooks": [
+    {
+      "id": "a5c-ai.babysitter.on-run-start",
+      "event": "on-run-start",
+      "description": "Fired when a babysitter run is created and begins executing",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "runId": { "type": "string" },
+          "processId": { "type": "string" },
+          "entrypoint": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    {
+      "id": "a5c-ai.babysitter.on-run-complete",
+      "event": "on-run-complete",
+      "description": "Fired when a run finishes successfully with a final output",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "runId": { "type": "string" },
+          "processId": { "type": "string" },
+          "output": { "type": "object" },
+          "completedAt": { "type": "string", "format": "date-time" },
+          "totalIterations": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "a5c-ai.babysitter.on-run-fail",
+      "event": "on-run-fail",
+      "description": "Fired when a run terminates with an unrecoverable error",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "runId": { "type": "string" },
+          "processId": { "type": "string" },
+          "error": { "type": "string" },
+          "category": { "type": "string", "enum": ["Configuration", "Validation", "Runtime", "External", "Internal"] },
+          "failedAt": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    {
+      "id": "a5c-ai.babysitter.on-task-start",
+      "event": "on-task-start",
+      "description": "Fired when an effect (task, breakpoint, sleep) is dispatched by the process",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "runId": { "type": "string" },
+          "effectId": { "type": "string" },
+          "taskId": { "type": "string" },
+          "kind": { "type": "string", "enum": ["node", "breakpoint", "orchestrator_task", "sleep"] },
+          "title": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "a5c-ai.babysitter.on-task-complete",
+      "event": "on-task-complete",
+      "description": "Fired when a pending effect is resolved and its result posted to the run",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "runId": { "type": "string" },
+          "effectId": { "type": "string" },
+          "taskId": { "type": "string" },
+          "kind": { "type": "string" },
+          "result": { "type": "object" },
+          "durationMs": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "a5c-ai.babysitter.on-breakpoint",
+      "event": "on-breakpoint",
+      "description": "Fired when the process hits a ctx.breakpoint() and requires human approval to continue",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "runId": { "type": "string" },
+          "effectId": { "type": "string" },
+          "question": { "type": "string" },
+          "title": { "type": "string" },
+          "context": { "type": "object" }
+        }
+      }
+    },
+    {
+      "id": "a5c-ai.babysitter.on-iteration-start",
+      "event": "on-iteration-start",
+      "description": "Fired at the start of each orchestration iteration (replay cycle)",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "runId": { "type": "string" },
+          "iteration": { "type": "number" },
+          "journalLength": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "a5c-ai.babysitter.on-iteration-end",
+      "event": "on-iteration-end",
+      "description": "Fired at the end of each orchestration iteration with the outcome",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "runId": { "type": "string" },
+          "iteration": { "type": "number" },
+          "outcome": { "type": "string", "enum": ["completed", "waiting", "failed"] },
+          "pendingEffects": { "type": "number" }
+        }
+      }
+    }
+  ],
+  "instructions": [
+    {
+      "file": "instructions.md",
+      "description": "Babysitter orchestration guidance for Copilot chat"
+    }
+  ],
+  "configuration": {
+    "BABYSITTER_RUNS_DIR": {
+      "type": "string",
+      "default": ".a5c/runs",
+      "description": "Root directory for run storage"
+    },
+    "BABYSITTER_MAX_ITERATIONS": {
+      "type": "number",
+      "default": 256,
+      "description": "Maximum orchestration iterations per run"
+    },
+    "BABYSITTER_QUALITY_THRESHOLD": {
+      "type": "number",
+      "default": 80,
+      "description": "Minimum quality score to pass (0-100)"
+    },
+    "BABYSITTER_TIMEOUT": {
+      "type": "number",
+      "default": 120000,
+      "description": "General operation timeout in milliseconds"
+    }
+  },
+  "marketplace": {
+    "categories": ["AI", "Orchestration", "Workflow", "Testing"],
+    "tags": ["babysitter", "orchestration", "tdd", "workflow", "event-sourcing", "breakpoints", "quality-gates"],
+    "installCommand": "npx @a5c-ai/babysitter-sdk configure"
+  }
+}

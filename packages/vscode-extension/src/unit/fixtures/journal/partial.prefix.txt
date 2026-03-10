@@ -1,0 +1,3 @@
+{"a":"first complete line"}
+{"b":"second complete line"}
+{"c":"third line"}

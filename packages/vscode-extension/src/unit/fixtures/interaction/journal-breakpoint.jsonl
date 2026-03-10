@@ -1,0 +1,2 @@
+{"type":"RUN_CREATED","recordedAt":"2026-01-05T01:02:06.000Z","data":{"runId":"run-test"}}
+{"type":"breakpoint","status":"awaiting","prompt":"Please clarify the desired behavior.","recordedAt":"2026-01-05T01:02:07.000Z"}

@@ -1,0 +1,12 @@
+.vscode/**
+node_modules/**
+!node_modules/node-pty/**
+src/**
+dist/unit/**
+dist/__tests__/**
+.github/**
+.kanban/**
+tsconfig.json
+.eslintrc*
+.prettierrc*
+*.map

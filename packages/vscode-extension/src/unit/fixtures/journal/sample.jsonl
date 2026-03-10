@@ -1,0 +1,3 @@
+{"type":"RUN_CREATED","recordedAt":"2026-01-05T01:02:06.000Z","data":{"runId":"run-abc"}}
+{"type":"EFFECT_REQUESTED","recordedAt":"2026-01-05T01:02:07.000Z","data":{"effectId":"eff-1"}}
+{"type":"EFFECT_RESOLVED","recordedAt":"2026-01-05T01:02:08.000Z","data":{"effectId":"eff-1"}}

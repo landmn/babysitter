@@ -1,0 +1,163 @@
+{
+  "name": "babysitter-vscode",
+  "version": "0.0.180",
+  "publisher": "a5c-ai",
+  "displayName": "Babysitter",
+  "description": "Orchestrate complex, multi-step AI workflows from VS Code",
+  "extensionKind": ["workspace"],
+  "keywords": ["babysitter", "orchestration", "workflow", "tdd", "quality", "agent"],
+  "engines": {
+    "vscode": "^1.111.0"
+  },
+  "main": "./dist/extension.js",
+  "enabledApiProposals": [
+    "chatSessionsProvider"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:babysitter.activate",
+    "onCommand:babysitter.dispatchRun",
+    "onCommand:babysitter.dispatchRunFromTaskFile",
+    "onCommand:babysitter.resumeRun",
+    "onCommand:babysitter.showConfigurationErrors",
+    "onCommand:babysitter.openPromptBuilder"
+  ],
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "babysitter",
+        "name": "babysitter",
+        "fullName": "Babysitter",
+        "description": "Orchestrate complex workflows"
+      }
+    ],
+    "commands": [
+      {
+        "command": "babysitter.activate",
+        "title": "Babysitter: Activate"
+      },
+      {
+        "command": "babysitter.dispatchRun",
+        "title": "Babysitter: Dispatch Run"
+      },
+      {
+        "command": "babysitter.dispatchRunFromTaskFile",
+        "title": "Babysitter: Dispatch Run from Task File"
+      },
+      {
+        "command": "babysitter.resumeRun",
+        "title": "Babysitter: Resume Run"
+      },
+      {
+        "command": "babysitter.showConfigurationErrors",
+        "title": "Babysitter: Show Configuration Errors"
+      },
+      {
+        "command": "babysitter.openPromptBuilder",
+        "title": "Babysitter: Open Prompt Builder"
+      },
+      {
+        "command": "babysitter.openRunDetails",
+        "title": "Babysitter: Open Run Details"
+      },
+      {
+        "command": "babysitter.openRunLogs",
+        "title": "Babysitter: Open Run Logs"
+      },
+      {
+        "command": "babysitter.runs.refresh",
+        "title": "Babysitter: Refresh Runs",
+        "icon": "$(refresh)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "babysitter.openPromptBuilder",
+        "key": "ctrl+alt+b p",
+        "when": "editorFocus || !editorFocus"
+      },
+      {
+        "command": "babysitter.dispatchRun",
+        "key": "ctrl+alt+b n",
+        "when": "editorFocus || !editorFocus"
+      },
+      {
+        "command": "babysitter.resumeRun",
+        "key": "ctrl+alt+b r",
+        "when": "editorFocus || !editorFocus"
+      },
+      {
+        "command": "babysitter.openRunDetails",
+        "key": "ctrl+alt+b d",
+        "when": "editorFocus || !editorFocus"
+      },
+      {
+        "command": "babysitter.openRunLogs",
+        "key": "ctrl+alt+b l",
+        "when": "editorFocus || !editorFocus"
+      },
+      {
+        "command": "babysitter.runs.refresh",
+        "key": "ctrl+alt+b shift+r",
+        "when": "editorFocus || !editorFocus"
+      }
+    ],
+    "configuration": {
+      "title": "Babysitter",
+      "properties": {
+        "babysitter.sdk.binaryPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the Babysitter SDK binary. Leave empty to use npx."
+        },
+        "babysitter.runsRoot": {
+          "type": "string",
+          "default": "",
+          "description": "Root directory for Babysitter runs. Defaults to .a5c/runs in workspace."
+        },
+        "babysitter.breakpoints.apiUrl": {
+          "type": "string",
+          "default": "http://localhost:3185",
+          "description": "URL of the Babysitter breakpoints API."
+        },
+        "babysitter.breakpoints.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Babysitter breakpoints integration."
+        }
+      }
+    },
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "babysitter.dispatchRunFromTaskFile",
+          "when": "resourceScheme == file && resourceFilename =~ /\\.task\\.md$/",
+          "group": "babysitter"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "compile": "tsc -p tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.30",
+    "@types/vscode": "^1.90.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "@vscode/test-electron": "^2.4.0",
+    "@vscode/vsce": "^3.7.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "mocha": "^10.4.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@a5c-ai/babysitter-breakpoints": "^0.0.170",
+    "@a5c-ai/babysitter-sdk": "^0.0.180"
+  }
+}
