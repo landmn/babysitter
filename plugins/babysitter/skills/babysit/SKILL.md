@@ -129,11 +129,10 @@ $CLI run:create \
 - `--process-id <id>` — unique identifier for the process definition
 - `--entry <path>#<export>` — path to the process JS file and its named export (e.g., `./my-process.js#process`)
 - `--prompt "$PROMPT"` — the user's initial prompt/request text
-- `--harness claude-code` — activates Claude Code session binding (init + associate in one step). The session ID is auto-detected from `CLAUDE_ENV_FILE` (written by the session-start hook) or `CLAUDE_SESSION_ID` env var.
+- `--harness claude-code` — activates Claude Code session binding (init + associate in one step). The session ID is auto-detected from `CLAUDE_ENV_FILE` (written by the session-start hook).
 - `--plugin-root "${CLAUDE_PLUGIN_ROOT}"` — plugin root directory for state file resolution
 
 **Optional flags:**
-- `--session-id <id>` — explicitly provide session ID (normally auto-detected by `--harness claude-code`)
 - `--inputs <file>` — path to a JSON file with process inputs
 - `--run-id <id>` — override auto-generated run ID
 - `--runs-dir <dir>` — override runs directory (default: `.a5c/runs`)
