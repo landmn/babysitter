@@ -19,10 +19,25 @@ cd packages/vscode-extension
 npm install
 npm run build
 npm run package
-code --install-extension babysitter-vscode-0.0.180.vsix
+code --install-extension ./babysitter-vscode-0.0.180.vsix --force
+```
+
+On Windows PowerShell, prefer `code.cmd` to ensure the CLI wrapper is used:
+
+```powershell
+code.cmd --install-extension .\babysitter-vscode-0.0.180.vsix --force
+code.cmd --list-extensions | Select-String a5c-ai.babysitter-vscode
 ```
 
 Restart VS Code. The `@babysitter` participant will appear in Copilot Chat.
+
+If you use proposed API features (Chat Sessions integration), start VS Code with:
+
+```powershell
+code.cmd --enable-proposed-api a5c-ai.babysitter-vscode
+```
+
+or run the extension in Extension Development Host mode.
 
 ### Diagnostic script
 
@@ -115,6 +130,11 @@ Copilot and teaches it babysitter orchestration patterns without the extension.
 **`@babysitter` not found in Copilot Chat**
 - Rebuild and reinstall the VSIX, then restart VS Code.
 - Confirm the extension is listed under installed extensions.
+
+**Optional features not loaded: `chatSessionsProvider`**
+- This API is proposed; VS Code requires proposed API enablement at launch.
+- Start VS Code with `code.cmd --enable-proposed-api a5c-ai.babysitter-vscode`.
+- Alternatively, run in Extension Development Host mode.
 
 **SDK commands not found**
 - `npm install -g @a5c-ai/babysitter-sdk` or use `npx @a5c-ai/babysitter-sdk`.

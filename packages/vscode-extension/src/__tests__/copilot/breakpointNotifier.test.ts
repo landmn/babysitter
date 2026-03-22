@@ -25,6 +25,8 @@
 
 import * as assert from 'assert';
 
+const childProcessModule = require('child_process') as typeof import('child_process');
+
 // ── Vscode mock ───────────────────────────────────────────────────────────────
 
 import {
@@ -79,12 +81,31 @@ function makeNotifier() {
   return { notifier, ctx, out };
 }
 
+function stubExecFileSuccess(): () => void {
+  const originalExecFile = childProcessModule.execFile;
+
+  childProcessModule.execFile = ((
+    _file: string,
+    _args?: ReadonlyArray<string> | null,
+    _options?: import('child_process').ExecFileOptions | null,
+    callback?: ((error: Error | null, stdout: string, stderr: string) => void) | null,
+  ) => {
+    callback?.(null, '', '');
+    return {} as import('child_process').ChildProcess;
+  }) as typeof childProcessModule.execFile;
+
+  return () => {
+    childProcessModule.execFile = originalExecFile;
+  };
+}
+
 // ── Suite ─────────────────────────────────────────────────────────────────────
 
 suite('BabysitterBreakpointNotifier', () => {
   // ── Test 1 ──────────────────────────────────────────────────────────────────
   test('showWarningMessage is called with breakpoint question', async () => {
     const { notifier } = makeNotifier();
+    const restoreExecFile = stubExecFileSuccess();
 
     // Capture calls to showWarningMessage
     const warningCalls: unknown[][] = [];
@@ -128,6 +149,7 @@ suite('BabysitterBreakpointNotifier', () => {
 
       clearInterval(entry.intervalHandle);
     } finally {
+      restoreExecFile();
       vscodeStub.window.showWarningMessage = originalShowWarning;
     }
 
@@ -176,6 +198,7 @@ suite('BabysitterBreakpointNotifier', () => {
   // ── Test 6 ──────────────────────────────────────────────────────────────────
   test('handleBreakpoint uses default options ["Approve","Reject"] when payload has none', async () => {
     const { notifier } = makeNotifier();
+    const restoreExecFile = stubExecFileSuccess();
 
     const warningCalls: unknown[][] = [];
     const originalShowWarning = vscodeStub.window.showWarningMessage;
@@ -208,6 +231,7 @@ suite('BabysitterBreakpointNotifier', () => {
 
       clearInterval(entry.intervalHandle);
     } finally {
+      restoreExecFile();
       vscodeStub.window.showWarningMessage = originalShowWarning;
     }
 

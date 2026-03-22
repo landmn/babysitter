@@ -5,6 +5,10 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as crypto from 'crypto';
 
+function npxCommand(): string {
+  return process.platform === 'win32' ? 'npx.cmd' : 'npx';
+}
+
 export type AgentStatus = 'idle' | 'running' | 'waiting-breakpoint' | 'completed' | 'failed';
 
 interface IterateJsonOutput {
@@ -41,7 +45,7 @@ function resolveBabysitterCliPath(workspaceRoot: string): { command: string; arg
   }
 
   // Fall back to npx
-  return { command: 'npx', args: ['-y', '@a5c-ai/babysitter-sdk'] };
+  return { command: npxCommand(), args: ['-y', '@a5c-ai/babysitter-sdk'] };
 }
 
 /**

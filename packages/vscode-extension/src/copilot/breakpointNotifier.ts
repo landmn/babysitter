@@ -4,6 +4,10 @@ import * as path from 'path';
 import * as os from 'os';
 import { execFile } from 'child_process';
 
+function npxCommand(): string {
+  return process.platform === 'win32' ? 'npx.cmd' : 'npx';
+}
+
 // ── Types ────────────────────────────────────────────────────────────────────
 
 interface BreakpointPayload {
@@ -62,7 +66,7 @@ function resolveBabysitterBinary(workspaceRoot: string): {
   }
 
   // fallback to npx
-  return { command: 'npx', prefixArgs: ['@a5c-ai/babysitter-sdk'] };
+  return { command: npxCommand(), prefixArgs: ['@a5c-ai/babysitter-sdk'] };
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

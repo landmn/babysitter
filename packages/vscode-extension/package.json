@@ -4,6 +4,7 @@
   "publisher": "a5c-ai",
   "displayName": "Babysitter",
   "description": "Orchestrate complex, multi-step AI workflows from VS Code",
+  "license": "MIT",
   "extensionKind": ["workspace"],
   "keywords": ["babysitter", "orchestration", "workflow", "tdd", "quality", "agent"],
   "repository": {
@@ -17,15 +18,6 @@
   "main": "./dist/extension.js",
   "enabledApiProposals": [
     "chatSessionsProvider"
-  ],
-  "activationEvents": [
-    "onStartupFinished",
-    "onCommand:babysitter.activate",
-    "onCommand:babysitter.dispatchRun",
-    "onCommand:babysitter.dispatchRunFromTaskFile",
-    "onCommand:babysitter.resumeRun",
-    "onCommand:babysitter.showConfigurationErrors",
-    "onCommand:babysitter.openPromptBuilder"
   ],
   "contributes": {
     "chatParticipants": [
@@ -132,7 +124,23 @@
         }
       }
     },
+    "views": {
+      "explorer": [
+        {
+          "id": "babysitter.runs",
+          "name": "Babysitter Runs",
+          "icon": "media/runs-view.svg"
+        }
+      ]
+    },
     "menus": {
+      "view/title": [
+        {
+          "command": "babysitter.runs.refresh",
+          "when": "view == babysitter.runs",
+          "group": "navigation"
+        }
+      ],
       "explorer/context": [
         {
           "command": "babysitter.dispatchRunFromTaskFile",
@@ -146,7 +154,8 @@
     "build": "tsc -p tsconfig.json",
     "compile": "tsc -p tsconfig.json --watch",
     "package": "vsce package --no-dependencies",
-    "test": "node ../../node_modules/mocha/bin/mocha.js --ui tdd 'dist/__tests__/**/*.test.js' 'dist/unit/**/*.test.js'"
+    "pretest": "npm run build",
+    "test": "node ../../node_modules/mocha/bin/mocha.js --require dist/__tests__/setup.js --ui tdd 'dist/__tests__/**/*.test.js' 'dist/unit/**/*.test.js'"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
